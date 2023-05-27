@@ -8,13 +8,14 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test:edinet": "node --loader ts-node/esm ./tests/edinet.ts",
+    "test:chains:FutureExtractor": "node --loader ts-node/esm ./tests/chains/FutureExtractor.ts",
     "test:laplace": "node --loader ts-node/esm ./tests/laplace.ts"
   },
   "dependencies": {
     "@types/node": "20.2.5",
     "@types/react": "18.2.7",
     "@types/react-dom": "18.2.4",
+    "cheerio": "^1.0.0-rc.12",
     "dotenv": "^16.0.3",
     "eslint": "8.41.0",
     "eslint-config-next": "13.4.4",
