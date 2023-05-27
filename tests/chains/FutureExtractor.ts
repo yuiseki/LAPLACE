@@ -10,12 +10,51 @@ import { OpenAIEmbeddings } from "langchain/embeddings/openai";
 const llm = new OpenAI({ temperature: 0 });
 const chain = loadFutureExtractorChain({ llm });
 
+// 来週
 const nextWeekNhkNewsUrl =
   "https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E6%9D%A5%E9%80%B1%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=5";
+// 来月
 const nextMonthNhkNewsUrl =
   "https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E6%9D%A5%E6%9C%88%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=15";
+// 来年
 const nextYearNhkNewsUrl =
   "https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E6%9D%A5%E5%B9%B4%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30";
+
+// 延長
+// https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E5%BB%B6%E9%95%B7%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
+// 以内
+// https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E4%BB%A5%E5%86%85%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
+// 開始
+// https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E9%96%8B%E5%A7%8B%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
+// ことし
+// https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E3%81%93%E3%81%A8%E3%81%97%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
+// 見通し
+// https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E8%A6%8B%E9%80%9A%E3%81%97%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
+// 年末
+// https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E5%B9%B4%E6%9C%AB%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
+// 年度末
+// https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E5%B9%B4%E5%BA%A6%E6%9C%AB%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
+// までに
+// https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E3%81%BE%E3%81%A7%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
+// （↑検索できない。なぜ？）
+// 以降
+// https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E4%BB%A5%E9%99%8D%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
+// 今後
+// https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E4%BB%8A%E5%BE%8C%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
+// 継続
+// https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E7%B6%99%E7%B6%9A%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
+// 予定
+// https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E4%BA%88%E5%AE%9A%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
+// 発表
+// https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E7%99%BA%E8%A1%A8%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
+// 計画
+// https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E8%A8%88%E7%94%BB%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
+// 取りやめ
+// https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E5%8F%96%E3%82%8A%E3%82%84%E3%82%81%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
+// 中止
+// https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E4%B8%AD%E6%AD%A2%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
+// 廃止
+// https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E5%BB%83%E6%AD%A2%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
 
 const futuresTokyoNhkNewsUrl = [
   nextWeekNhkNewsUrl,
