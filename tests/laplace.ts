@@ -1,4 +1,6 @@
 import * as dotenv from "dotenv";
+dotenv.config();
+
 import { AgentAction, AgentStep } from "langchain/schema";
 import { OpenAI } from "langchain/llms/openai";
 import { AgentExecutor, LLMSingleActionAgent } from "langchain/agents";
@@ -14,7 +16,6 @@ import { ReliefWeb } from "../../../src/utils/langchain/tools/reliefweb/index.ts
 
 import { loadLaplaceAgentChain } from "../src/utils/langchain/agents/laplace/index.ts";
 import { LaplaceOutputParser } from "../src/utils/langchain/agents/laplace/parser.ts";
-dotenv.config();
 
 const llm = new OpenAI({ temperature: 0 });
 const tools = [new Wikipedia()];
