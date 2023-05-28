@@ -81,7 +81,7 @@ const nextMonthEnd = new Date(now.getFullYear(), now.getMonth() + 2, 0);
 const nextYearStart = new Date(now.getFullYear() + 1, 0, 1);
 const nextYearEnd = new Date(now.getFullYear() + 2, 0, 0);
 
-const predictFuture = async (start: Date, end: Date) => {
+const futureForecast = async (start: Date, end: Date) => {
   const filteredFutureEvents = sortedFutureEvents.filter((event) => {
     return (
       start.getTime() <= new Date(event.futureNearDate).getTime() &&
@@ -103,17 +103,23 @@ const predictFuture = async (start: Date, end: Date) => {
 console.log("来月の未来予報");
 console.log("開始:", formatDate(nextMonthStart));
 console.log("終了:", formatDate(nextMonthEnd));
-const nextMonthFuture = await predictFuture(nextMonthStart, nextMonthEnd);
-console.log(nextMonthFuture);
+const nextMonthFutureForecast = await futureForecast(
+  nextMonthStart,
+  nextMonthEnd
+);
+console.log(nextMonthFutureForecast);
 
 console.log("年内の未来予報");
 console.log("開始:", formatDate(nextMonthStart));
 console.log("終了:", formatDate(nextYearStart));
-const thisYearFuture = await predictFuture(nextMonthStart, nextYearStart);
-console.log(thisYearFuture);
+const thisYearFutureForecast = await futureForecast(
+  nextMonthStart,
+  nextYearStart
+);
+console.log(thisYearFutureForecast);
 
 console.log("来年の未来予報");
 console.log("開始:", formatDate(nextYearStart));
 console.log("終了:", formatDate(nextYearEnd));
-const nextYearFuture = await predictFuture(nextYearStart, nextYearEnd);
-console.log(nextYearFuture);
+const nextYearFutureForecast = await futureForecast(nextYearStart, nextYearEnd);
+console.log(nextYearFutureForecast);
