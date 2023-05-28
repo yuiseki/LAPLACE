@@ -107,7 +107,7 @@ export default function Home() {
         margin: "0 auto 240px",
       }}
     >
-      <h1>LAPLACE</h1>
+      <h1>Predictions by LAPLACE</h1>
       <div
         style={{
           display: "flex",

@@ -2,7 +2,7 @@ import "./globals.css";
 
 export const metadata = {
   title: "LAPLACE",
-  description: "LAPLACE",
+  description: "Predictions by LAPLACE",
 };
 
 export default function RootLayout({
