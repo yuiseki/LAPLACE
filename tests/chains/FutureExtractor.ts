@@ -50,7 +50,6 @@ const nextYearNhkNewsUrl =
 // 予定
 const futureScheduleNhkNewsUrl =
   "https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E4%BA%88%E5%AE%9A%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30";
-
 //
 // 検索ワード候補
 //
@@ -66,6 +65,8 @@ const futureScheduleNhkNewsUrl =
 // 開始
 // https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E9%96%8B%E5%A7%8B%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
 //
+// 延期
+// 見送り
 // 見通し
 // https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E8%A6%8B%E9%80%9A%E3%81%97%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
 // 年末
