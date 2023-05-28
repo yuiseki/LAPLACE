@@ -3,48 +3,81 @@ dotenv.config();
 
 import { OpenAI } from "langchain/llms/openai";
 import { loadFutureExtractorChain } from "../../src/utils/langchain/chains/FutureExtractor/index.ts";
-import { Document } from "langchain/document";
-import { HNSWLib } from "langchain/vectorstores/hnswlib";
-import { OpenAIEmbeddings } from "langchain/embeddings/openai";
+
+import fs from "node:fs/promises";
+import { exit } from "node:process";
+
+const futureEventsLatestJsonFilePath =
+  "public/data/www3.nhk.or.jp/future_events/latest_events.json";
+const now = new Date();
+const today = now
+  .toLocaleDateString("ja-JP", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  })
+  .split("/")
+  .join("-");
+const futureEventsTodayJsonFilePath = `public/data/www3.nhk.or.jp/future_events/${today}_events.json`;
+
+try {
+  const alreadyFutureExtracted = (
+    await fs.lstat(futureEventsTodayJsonFilePath)
+  ).isFile();
+  if (alreadyFutureExtracted) {
+    console.log("already extracted, finish:", futureEventsTodayJsonFilePath);
+    exit(0);
+  }
+} catch (error) {
+  console.log("not yet extracted:", futureEventsTodayJsonFilePath);
+}
 
 const llm = new OpenAI({ temperature: 0 });
 const chain = loadFutureExtractorChain({ llm });
 
 // 来週
 const nextWeekNhkNewsUrl =
-  "https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E6%9D%A5%E9%80%B1%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=5";
+  "https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E6%9D%A5%E9%80%B1%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=15";
 // 来月
 const nextMonthNhkNewsUrl =
-  "https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E6%9D%A5%E6%9C%88%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=15";
+  "https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E6%9D%A5%E6%9C%88%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30";
+// ことし
+const thisYearNhkNewsUrl =
+  "https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E3%81%93%E3%81%A8%E3%81%97%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30";
 // 来年
 const nextYearNhkNewsUrl =
-  "https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E6%9D%A5%E5%B9%B4%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30";
+  "https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E6%9D%A5%E5%B9%B4%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=50";
+// 予定
+const futureScheduleNhkNewsUrl =
+  "https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E4%BA%88%E5%AE%9A%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30";
 
+//
+// 検索ワード候補
+//
+// までに
+// https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E3%81%BE%E3%81%A7%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
+// ↑検索できない。なぜ？
 // 延長
 // https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E5%BB%B6%E9%95%B7%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
+// ↑未来の日時を確定しづらい
 // 以内
 // https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E4%BB%A5%E5%86%85%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
+// ↑数週間、数か月、数年、などの曖昧な表現が増えるが、未来が多く含まれている
 // 開始
 // https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E9%96%8B%E5%A7%8B%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
-// ことし
-// https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E3%81%93%E3%81%A8%E3%81%97%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
+//
 // 見通し
 // https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E8%A6%8B%E9%80%9A%E3%81%97%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
 // 年末
 // https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E5%B9%B4%E6%9C%AB%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
 // 年度末
 // https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E5%B9%B4%E5%BA%A6%E6%9C%AB%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
-// までに
-// https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E3%81%BE%E3%81%A7%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
-// （↑検索できない。なぜ？）
 // 以降
 // https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E4%BB%A5%E9%99%8D%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
 // 今後
 // https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E4%BB%8A%E5%BE%8C%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
 // 継続
 // https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E7%B6%99%E7%B6%9A%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
-// 予定
-// https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E4%BA%88%E5%AE%9A%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
 // 発表
 // https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E7%99%BA%E8%A1%A8%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
 // 計画
@@ -58,8 +91,10 @@ const nextYearNhkNewsUrl =
 
 const futuresTokyoNhkNewsUrl = [
   nextWeekNhkNewsUrl,
+  thisYearNhkNewsUrl,
   nextMonthNhkNewsUrl,
   nextYearNhkNewsUrl,
+  futureScheduleNhkNewsUrl,
 ];
 const newsItems: Array<{
   link: string;
@@ -79,7 +114,7 @@ for await (const futureUrl of futuresTokyoNhkNewsUrl) {
 
 console.log(newsItems.length);
 
-const docs: Document[] = [];
+const futureEvents = [];
 for await (const newsItem of newsItems) {
   try {
     const text = `${newsItem.pubDate.split(" ")[0]} 配信
@@ -107,8 +142,7 @@ ${newsItem.description}`;
     const whatHappens = lines
       .filter((line) => line.includes("WhatHappens:"))[0]
       .split(": ")[1];
-    const pageContent = `${futureIndicateExpression}、${whatHappens}`;
-    const metadata = {
+    const futureEvent = {
       url: `https://www3.nhk.or.jp/news/${newsItem.link}`,
       title: newsItem.title,
       description: newsItem.description,
@@ -120,19 +154,22 @@ ${newsItem.description}`;
       whatHappens,
     };
     console.log("");
-    console.log("pageContent:", pageContent);
-    console.log("metadata", metadata);
+    console.log("futureEvent:", futureEvent);
     console.log("----- ----- ----- ----- -----");
-    const doc = new Document({
-      pageContent: pageContent,
-      metadata: metadata,
-    });
-    docs.push(doc);
+    futureEvents.push(futureEvent);
   } catch (error) {
     console.error(error);
   }
 }
 
-const vectorStore = await HNSWLib.fromDocuments(docs, new OpenAIEmbeddings());
-const directory = "public/data/www3.nhk.or.jp/vector_stores/";
-await vectorStore.save(directory);
+console.log(futureEvents.length);
+
+await fs.writeFile(
+  futureEventsLatestJsonFilePath,
+  JSON.stringify(futureEvents, null, 2)
+);
+
+await fs.writeFile(
+  futureEventsTodayJsonFilePath,
+  JSON.stringify(futureEvents, null, 2)
+);

@@ -76,6 +76,21 @@ FutureFarDate: 2023-06-05
 FutureIndicateExpression: 来月1日
 FutureIndicateExpression: 来月5日
 WhatHappens: アメリカの議会が、債務上限の引き上げなどに応じなければ、債務の不履行に陥るおそれがある
+
+Input text:
+2023-05-12 配信
+「京アニ」放火殺人事件 初公判9月5日 判決は来年1月25日に
+4年前、「京都アニメーション」のスタジオが放火され、社員36人が死亡した事件で、殺人などの罪で起訴された青葉真司被告の裁判員裁判の初公判が、ことし9月5日に開かれ、判決が来年1月25日に言い渡されることになりました。
+Output:
+CurrentDate: 2023-05-12
+FutureNearDate: 2023-09-05
+FutureFarDate: 2023-09-05
+FutureIndicateExpression: ことし9月5日
+WhatHappens: 青葉真司被告の裁判員裁判の初公判が開かれる
+FutureNearDate: 2024-01-25
+FutureFarDate: 2024-01-25
+FutureIndicateExpression: 来年1月25日
+WhatHappens: 青葉真司被告の裁判員裁判の判決が言い渡される
 -----
 
 Input text:
