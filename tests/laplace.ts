@@ -2,11 +2,18 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 import { HNSWLib } from "langchain/vectorstores/hnswlib";
+import { MemoryVectorStore } from "langchain/vectorstores/memory";
 import { OpenAI } from "langchain/llms/openai";
 import { OpenAIEmbeddings } from "langchain/embeddings/openai";
-import { loadSummarizationChain } from "langchain/chains";
+import {
+  RetrievalQAChain,
+  loadQAMapReduceChain,
+  loadQAStuffChain,
+  loadSummarizationChain,
+} from "langchain/chains";
 
 import fs from "node:fs/promises";
+import { Document } from "langchain/document";
 
 const formatDate = (date: Date) => {
   return date
@@ -62,19 +69,6 @@ const sortedFutureEvents = validFutureEvents.sort((a, b) => {
   }
 });
 
-/*
-for await (const event of sortedFutureEvents) {
-  const futureNearDate = new Date(event.futureNearDate);
-  const futureFarDate = new Date(event.futureFarDate);
-  const whatHappens = event.whatHappens;
-  console.log(
-    `${formatDate(futureNearDate)} / ${formatDate(
-      futureFarDate
-    )}: ${whatHappens}`
-  );
-}
-*/
-
 const now = new Date();
 const nextMonthStart = new Date(now.getFullYear(), now.getMonth() + 1, 1);
 const nextMonthEnd = new Date(now.getFullYear(), now.getMonth() + 2, 0);
@@ -88,18 +82,31 @@ const futureForecast = async (start: Date, end: Date) => {
       new Date(event.futureNearDate).getTime() <= end.getTime()
     );
   });
-  let future = "";
+  const docs: Document[] = [];
+  //future += `本日は${formatDate(now)}である。\n`;
   for await (const event of filteredFutureEvents) {
     const futureNearDate = new Date(event.futureNearDate);
     const futureFarDate = new Date(event.futureFarDate);
     const whatHappens = event.whatHappens;
-    future += `${formatDate(futureNearDate)}から${formatDate(
+    const newFuture = `${formatDate(futureNearDate)}から${formatDate(
       futureFarDate
-    )}まで: ${whatHappens}\n`;
+    )}の間に、${whatHappens}`;
+    console.log(newFuture);
+    docs.push(new Document({ pageContent: newFuture }));
   }
-  return future;
+  return docs;
 };
 
+console.log("年内の未来予報");
+console.log("開始:", formatDate(nextMonthStart));
+console.log("終了:", formatDate(nextYearEnd));
+const thisYearFutureForecast = await futureForecast(
+  nextMonthStart,
+  nextYearEnd
+);
+console.log(thisYearFutureForecast.length);
+
+/*
 console.log("来月の未来予報");
 console.log("開始:", formatDate(nextMonthStart));
 console.log("終了:", formatDate(nextMonthEnd));
@@ -123,3 +130,31 @@ console.log("開始:", formatDate(nextYearStart));
 console.log("終了:", formatDate(nextYearEnd));
 const nextYearFutureForecast = await futureForecast(nextYearStart, nextYearEnd);
 console.log(nextYearFutureForecast);
+*/
+
+const embeddings = new OpenAIEmbeddings();
+const vectorStore = await MemoryVectorStore.fromDocuments(
+  thisYearFutureForecast,
+  embeddings
+);
+
+const llm = new OpenAI({ temperature: 0, maxTokens: 2000 });
+const chain = RetrievalQAChain.fromLLM(llm, vectorStore.asRetriever(20));
+const questions = [
+  "今後、経済的に最も注目するべき出来事を教えてください",
+  "今後、日本の政治で最も注目するべき出来事を教えてください",
+  "今後、軍事情勢で最も注目するべき出来事を教えてください",
+  "今後、テクノロジー関係で最も注目するべき出来事を教えてください",
+  "いま投資をする場合に予想される大きなリスクを教えてください",
+  "エネルギー価格は今後どうなりますか？",
+  "少子化問題は今後どうなりますか？",
+];
+for await (const question of questions) {
+  console.log("----- ----- ----- -----");
+  console.log("Q:", question);
+  const result = await chain.call({
+    query: `今日は${formatDate(now)}です。${question}`,
+  });
+  console.log("A:", result.text);
+  console.log("----- ----- ----- -----");
+}
