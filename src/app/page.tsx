@@ -52,6 +52,12 @@ export default function Home() {
         }
         return true;
       })
+      .filter((element: any, index: number, self: any) => {
+        return (
+          self.findIndex((e: any) => e.whatHappens === element.whatHappens) ===
+          index
+        );
+      })
       .sort((a: any, b: any) => {
         if (a.futureFarDate !== b.futureFarDate) {
           return (
@@ -118,12 +124,12 @@ export default function Home() {
           const now = new Date();
           const thisMonthStart = new Date(
             now.getFullYear(),
-            now.getMonth() + idx,
+            now.getMonth() + idx - 1,
             1
           );
           const thisMonthEnd = new Date(
             now.getFullYear(),
-            now.getMonth() + idx + 1,
+            now.getMonth() + idx,
             0
           );
           const thisMonthFutureEvents = getFutureEvents(

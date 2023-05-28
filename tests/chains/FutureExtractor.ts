@@ -196,7 +196,7 @@ const predictFuture = async (newsItem: {
 };
 
 const futureEvents = await Promise.all(
-  newsItems.map((newsItem) => predictFuture(newsItem))
+  uniqueNewsItems.map((newsItem) => predictFuture(newsItem))
 );
 
 console.log(futureEvents.length);
