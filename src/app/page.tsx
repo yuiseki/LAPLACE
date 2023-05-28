@@ -141,19 +141,34 @@ export default function Home() {
                     const futureNearDate = new Date(event.futureNearDate);
                     const futureFarDate = new Date(event.futureFarDate);
                     const whatHappens = event.whatHappens;
-                    const newFuture = `${formatDate(
-                      futureNearDate
-                    )}から${formatDate(futureFarDate)}の間に、${whatHappens}`;
-                    return (
-                      <div
-                        key={event.link}
-                        style={{
-                          margin: "20px 0",
-                        }}
-                      >
-                        {newFuture}
-                      </div>
-                    );
+                    if (futureNearDate.getTime() === futureFarDate.getTime()) {
+                      return (
+                        <div
+                          key={event.link}
+                          style={{
+                            margin: "20px 0",
+                          }}
+                        >
+                          <b>{formatDate(futureNearDate)}に、</b>
+                          {whatHappens}
+                        </div>
+                      );
+                    } else {
+                      return (
+                        <div
+                          key={event.link}
+                          style={{
+                            margin: "20px 0",
+                          }}
+                        >
+                          <b>
+                            {formatDate(futureNearDate)}から
+                            {formatDate(futureFarDate)}の間に、
+                          </b>
+                          {whatHappens}
+                        </div>
+                      );
+                    }
                   })}
               </div>
             </div>
