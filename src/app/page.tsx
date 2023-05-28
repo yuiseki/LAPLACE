@@ -120,7 +120,7 @@ export default function Home() {
           flexDirection: "column",
         }}
       >
-        {Array.from({ length: 24 }, (_, i) => i + 1).map((idx) => {
+        {Array.from({ length: 49 }, (_, i) => i + 1).map((idx) => {
           const now = new Date();
           const thisMonthStart = new Date(
             now.getFullYear(),
