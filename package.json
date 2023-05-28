@@ -19,6 +19,7 @@
     "dotenv": "^16.0.3",
     "eslint": "8.41.0",
     "eslint-config-next": "13.4.4",
+    "faiss-node": "^0.2.0",
     "hnswlib-node": "^1.4.2",
     "langchain": "^0.0.84",
     "next": "13.4.4",

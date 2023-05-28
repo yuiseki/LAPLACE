@@ -3,6 +3,7 @@ dotenv.config();
 
 import { HNSWLib } from "langchain/vectorstores/hnswlib";
 import { MemoryVectorStore } from "langchain/vectorstores/memory";
+import { FaissStore } from "langchain/vectorstores/faiss";
 import { OpenAI } from "langchain/llms/openai";
 import { OpenAIEmbeddings } from "langchain/embeddings/openai";
 import {
@@ -133,7 +134,7 @@ console.log(nextYearFutureForecast);
 */
 
 const embeddings = new OpenAIEmbeddings();
-const vectorStore = await MemoryVectorStore.fromDocuments(
+const vectorStore = await FaissStore.fromDocuments(
   thisYearFutureForecast,
   embeddings
 );
