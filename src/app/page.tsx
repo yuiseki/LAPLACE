@@ -50,15 +50,15 @@ export default function Home() {
         return true;
       })
       .sort((a: any, b: any) => {
-        if (a.futureNearDate !== b.futureNearDate) {
-          return (
-            new Date(a.futureNearDate).getTime() -
-            new Date(b.futureNearDate).getTime()
-          );
-        } else {
+        if (a.futureFarDate !== b.futureFarDate) {
           return (
             new Date(a.futureFarDate).getTime() -
             new Date(b.futureFarDate).getTime()
+          );
+        } else {
+          return (
+            new Date(a.futureNearDate).getTime() -
+            new Date(b.futureNearDate).getTime()
           );
         }
       });
