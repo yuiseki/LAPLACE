@@ -210,7 +210,3 @@ await fs.writeFile(
   futureEventsTodayJsonFilePath,
   JSON.stringify(futureEvents, null, 2)
 );
-
-const texts = ["hoge", "fuga", "piyo"];
-const predict = async (text:string) => chain.call({text});
-const results = await Promise.all(texts.map((text) => predict(text)));
