@@ -14,7 +14,7 @@ export const AvatarIcon: React.FC<{ who: string }> = ({ who }) => {
         <img
           width={30}
           height={30}
-          src="https://i.gyazo.com/1e58e82090fc6f9b140e23fc03faefc7.png"
+          src="https://i.gyazo.com/4b2d3aa2ff31f6c73bbd1c2ab29760ac.png"
           alt="ai icon"
         />
       ) : (

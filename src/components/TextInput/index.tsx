@@ -68,7 +68,7 @@ export const TextInput = ({
       >
         <img
           style={{ height: "24px", width: "24px" }}
-          src="https://i.gyazo.com/1e58e82090fc6f9b140e23fc03faefc7.png"
+          src="https://i.gyazo.com/4b2d3aa2ff31f6c73bbd1c2ab29760ac.png"
           alt="Request updating of web site"
           title="Request updating of web site"
         />
