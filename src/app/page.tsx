@@ -31,11 +31,14 @@ export default function Home() {
 
     const newSortedFutureEvents = data
       .filter((futureEvent: any) => {
+        if (!futureEvent) {
+          return false;
+        }
         if (
-          futureEvent.futureNearDate === "Unknown" ||
-          futureEvent.futureFarDate === "Unknown" ||
           futureEvent.futureNearDate === null ||
-          futureEvent.futureFarDate === null
+          futureEvent.futureFarDate === null ||
+          futureEvent.futureNearDate === "Unknown" ||
+          futureEvent.futureFarDate === "Unknown"
         ) {
           return false;
         }

@@ -7,34 +7,6 @@ import { loadFutureExtractorChain } from "../../src/utils/langchain/chains/Futur
 import fs from "node:fs/promises";
 import { exit } from "node:process";
 
-const futureEventsLatestJsonFilePath =
-  "public/data/www3.nhk.or.jp/future_events/latest_events.json";
-const now = new Date();
-const today = now
-  .toLocaleDateString("ja-JP", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  })
-  .split("/")
-  .join("-");
-const futureEventsTodayJsonFilePath = `public/data/www3.nhk.or.jp/future_events/${today}_events.json`;
-
-try {
-  const alreadyFutureExtracted = (
-    await fs.lstat(futureEventsTodayJsonFilePath)
-  ).isFile();
-  if (alreadyFutureExtracted) {
-    console.log("already extracted, finish:", futureEventsTodayJsonFilePath);
-    exit(0);
-  }
-} catch (error) {
-  console.log("not yet extracted:", futureEventsTodayJsonFilePath);
-}
-
-const llm = new OpenAI({ temperature: 0 });
-const chain = loadFutureExtractorChain({ llm });
-
 // 来週
 const nextWeekNhkNewsUrl =
   "https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E6%9D%A5%E9%80%B1%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=15";
@@ -46,22 +18,23 @@ const thisYearNhkNewsUrl =
   "https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E3%81%93%E3%81%A8%E3%81%97%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30";
 // 来年
 const nextYearNhkNewsUrl =
-  "https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E6%9D%A5%E5%B9%B4%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=50";
+  "https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E6%9D%A5%E5%B9%B4%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=80";
 // 予定
 const futureScheduleNhkNewsUrl =
-  "https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E4%BA%88%E5%AE%9A%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30";
+  "https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E4%BA%88%E5%AE%9A%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=60";
+// 以内
+const futureWithinNhkNewsUrl =
+  "https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E4%BB%A5%E5%86%85%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=20";
+
 //
 // 検索ワード候補
 //
-// までに
+// まで
 // https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E3%81%BE%E3%81%A7%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
 // ↑検索できない。なぜ？
 // 延長
 // https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E5%BB%B6%E9%95%B7%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
-// ↑未来の日時を確定しづらい
-// 以内
-// https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E4%BB%A5%E5%86%85%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
-// ↑数週間、数か月、数年、などの曖昧な表現が増えるが、未来が多く含まれている
+// ↑ノイズが多い。未来の日時を確定しづらい
 // 開始
 // https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E9%96%8B%E5%A7%8B%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
 //
@@ -75,8 +48,10 @@ const futureScheduleNhkNewsUrl =
 // https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E5%B9%B4%E5%BA%A6%E6%9C%AB%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
 // 以降
 // https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E4%BB%A5%E9%99%8D%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
+// ↑過去の情報のほうが多い
 // 今後
 // https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E4%BB%8A%E5%BE%8C%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
+// ↑意外とダメ
 // 継続
 // https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E7%B6%99%E7%B6%9A%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
 // 発表
@@ -91,19 +66,20 @@ const futureScheduleNhkNewsUrl =
 // https://noa-api.nhk.jp/r1/db/_search?q=%28%22%E5%BB%83%E6%AD%A2%22%29&index=news&fields=title%2Cdescription&_source=link%2CpubDate%2Ctitle%2Cdescription&sortkey=pubDate&order=desc&from=0&limit=30
 
 const futuresTokyoNhkNewsUrl = [
-  nextWeekNhkNewsUrl,
-  thisYearNhkNewsUrl,
-  nextMonthNhkNewsUrl,
-  nextYearNhkNewsUrl,
+  futureWithinNhkNewsUrl,
   futureScheduleNhkNewsUrl,
+  nextYearNhkNewsUrl,
+  nextMonthNhkNewsUrl,
+  thisYearNhkNewsUrl,
+  nextWeekNhkNewsUrl,
 ];
+
 const newsItems: Array<{
   link: string;
   description: string;
   title: string;
   pubDate: string;
 }> = [];
-
 for await (const futureUrl of futuresTokyoNhkNewsUrl) {
   console.log("news search url:", futureUrl);
   const res = await fetch(futureUrl);
@@ -115,12 +91,68 @@ for await (const futureUrl of futuresTokyoNhkNewsUrl) {
 
 console.log(newsItems.length);
 
-const futureEvents = [];
-for await (const newsItem of newsItems) {
+const uniqueNewsItems: Array<{
+  link: string;
+  description: string;
+  title: string;
+  pubDate: string;
+}> = newsItems.filter(
+  (element, index, self) =>
+    self.findIndex((e) => e.link === element.link) === index
+);
+
+console.log(uniqueNewsItems.length);
+
+const futureEventsLatestJsonFilePath =
+  "public/data/www3.nhk.or.jp/future_events/latest_events.json";
+const now = new Date();
+const today = now
+  .toLocaleDateString("ja-JP", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  })
+  .split("/")
+  .join("-");
+const futureEventsTodayJsonFilePath = `public/data/www3.nhk.or.jp/future_events/${today}_events.json`;
+try {
+  const alreadyFutureExtracted = (
+    await fs.lstat(futureEventsTodayJsonFilePath)
+  ).isFile();
+  if (alreadyFutureExtracted) {
+    console.log("already extracted, finish:", futureEventsTodayJsonFilePath);
+    exit(0);
+  }
+} catch (error) {
+  console.log("not yet extracted:", futureEventsTodayJsonFilePath);
+}
+
+const llm = new OpenAI({ temperature: 0, maxConcurrency: 10 });
+const chain = loadFutureExtractorChain({ llm });
+
+const predictFuture = async (newsItem: {
+  link: string;
+  description: string;
+  title: string;
+  pubDate: string;
+}) => {
   try {
-    const text = `${newsItem.pubDate.split(" ")[0]} 配信
-${newsItem.title}
-${newsItem.description}`;
+    const info = `${newsItem.title}, ${newsItem.description}`;
+    if (
+      info.includes("選手") ||
+      info.includes("試合") ||
+      info.includes("優勝") ||
+      info.includes("野球") ||
+      info.includes("サッカー") ||
+      info.includes("アジアカップ") ||
+      info.includes("オリンピック") ||
+      info.includes("シミュレーション")
+    ) {
+      return;
+    }
+    const text = `${newsItem.pubDate.split(" ")[0]} 配信。${
+      newsItem.description
+    }`;
     console.log("----- ----- ----- ----- -----");
     console.log("Input text:");
     console.log(text);
@@ -157,11 +189,15 @@ ${newsItem.description}`;
     console.log("");
     console.log("futureEvent:", futureEvent);
     console.log("----- ----- ----- ----- -----");
-    futureEvents.push(futureEvent);
+    return futureEvent;
   } catch (error) {
     console.error(error);
   }
-}
+};
+
+const futureEvents = await Promise.all(
+  newsItems.map((newsItem) => predictFuture(newsItem))
+);
 
 console.log(futureEvents.length);
 
@@ -174,3 +210,7 @@ await fs.writeFile(
   futureEventsTodayJsonFilePath,
   JSON.stringify(futureEvents, null, 2)
 );
+
+const texts = ["hoge", "fuga", "piyo"];
+const predict = async (text:string) => chain.call({text});
+const results = await Promise.all(texts.map((text) => predict(text)));
