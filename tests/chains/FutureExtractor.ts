@@ -1,6 +1,8 @@
 import * as dotenv from "dotenv";
 dotenv.config();
 
+import { Md5 } from "ts-md5";
+
 import { OpenAI } from "langchain/llms/openai";
 import { loadFutureExtractorChain } from "../../src/utils/langchain/chains/FutureExtractor/index.ts";
 
@@ -137,6 +139,34 @@ const predictFuture = async (newsItem: {
   pubDate: string;
 }) => {
   try {
+    const md5 = new Md5();
+    md5.appendStr(`${newsItem.link}`);
+    const hash = md5.end();
+    if (!hash) {
+      return;
+    }
+    const futureEventBaseDir = `tmp/www3.nhk.or.jp/${hash.slice(
+      0,
+      1
+    )}/${hash.slice(0, 2)}`;
+    const futureEventJsonFilePath = `${futureEventBaseDir}/${hash}.json`;
+
+    // check already fetched
+    try {
+      const alreadyFetched = (await fs.lstat(futureEventJsonFilePath)).isFile();
+      if (alreadyFetched) {
+        console.log("already fetched news:", newsItem.link);
+        const futureEventJsonFile = await fs.readFile(
+          futureEventJsonFilePath,
+          "utf-8"
+        );
+        const futureEventJson = JSON.parse(futureEventJsonFile);
+        return futureEventJson;
+      }
+    } catch (error) {
+      console.log("fetch news:", newsItem.link);
+    }
+
     const info = `${newsItem.title}, ${newsItem.description}`;
     if (
       info.includes("選手") ||
@@ -189,6 +219,15 @@ const predictFuture = async (newsItem: {
     console.log("");
     console.log("futureEvent:", futureEvent);
     console.log("----- ----- ----- ----- -----");
+
+    await fs.mkdir(futureEventBaseDir, {
+      recursive: true,
+    });
+    await fs.writeFile(
+      futureEventJsonFilePath,
+      JSON.stringify(futureEvent, null, 2)
+    );
+
     return futureEvent;
   } catch (error) {
     console.error(error);
