@@ -62,6 +62,9 @@ export default function Home() {
           self.findIndex((e) => e.whatHappens === element.whatHappens) === index
         );
       })
+      .filter((element, index: number, self) => {
+        return self.findIndex((e) => e.title === element.title) === index;
+      })
       .filter((futureEvent) => {
         if (
           futureEvent.futureNearDate === null ||
@@ -162,45 +165,34 @@ export default function Home() {
           if (!thisMonthFutureEvents) return null;
           if (thisMonthFutureEvents.length === 0) return null;
           return (
-            <div key={idx} style={{ margin: "20px 0" }}>
-              <h3 style={{ width: "100%" }}>
+            <div key={idx} style={{ margin: "40px 0" }}>
+              <h2 style={{ width: "100%" }}>
                 {thisMonthStart.getFullYear()}年{thisMonthStart.getMonth() + 1}
                 月
-              </h3>
+              </h2>
               <div>
                 {thisMonthFutureEvents &&
                   thisMonthFutureEvents.map((event) => {
                     const futureNearDate = new Date(event.futureNearDate);
                     const futureFarDate = new Date(event.futureFarDate);
                     const whatHappens = event.whatHappens;
-                    if (futureNearDate.getTime() === futureFarDate.getTime()) {
-                      return (
-                        <div
-                          key={event.link}
-                          style={{
-                            margin: "20px 0",
-                          }}
-                        >
-                          <b>{formatDate(futureNearDate)}に、</b>
-                          {whatHappens}
-                        </div>
-                      );
-                    } else {
-                      return (
-                        <div
-                          key={event.link}
-                          style={{
-                            margin: "20px 0",
-                          }}
-                        >
-                          <b>
-                            {formatDate(futureNearDate)}から
-                            {formatDate(futureFarDate)}の間に、
-                          </b>
-                          {whatHappens}
-                        </div>
-                      );
-                    }
+                    const whenHappens =
+                      futureNearDate.getTime() === futureFarDate.getTime()
+                        ? `${formatDate(futureNearDate)}に、`
+                        : `${formatDate(futureNearDate)}から${formatDate(
+                            futureFarDate
+                          )}の間に、`;
+                    return (
+                      <div
+                        key={event.title}
+                        style={{
+                          margin: "40px 0",
+                        }}
+                      >
+                        <h3>{whenHappens}</h3>
+                        <p>{whatHappens}</p>
+                      </div>
+                    );
                   })}
               </div>
             </div>
