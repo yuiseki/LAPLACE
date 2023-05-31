@@ -12,17 +12,39 @@ const formatDate = (date: Date) => {
 };
 
 export default function Home() {
-  const { data, error } = useSWR(
-    "/data/www3.nhk.or.jp/future_events/latest_events.json",
-    jsonFetcher
-  );
+  const { data, error } = useSWR<
+    Array<{
+      link: string;
+      description: string;
+      title: string;
+      pubDate: string;
+      currentDate: string;
+      futureFarDate: string;
+      futureIndicateExpression: string;
+      futureNearDate: string;
+      whatHappens: string;
+    }>
+  >("/data/www3.nhk.or.jp/future_events/latest_events.json", jsonFetcher);
 
   const [inputText, setInputText] = useState("");
   const onSubmit = useCallback(async () => {
     console.log(inputText);
   }, [inputText]);
 
-  const [sortedFutureEvents, setSortedFutureEvents] = useState<any>(undefined);
+  const [sortedFutureEvents, setSortedFutureEvents] = useState<
+    | Array<{
+        link: string;
+        description: string;
+        title: string;
+        pubDate: string;
+        currentDate: string;
+        futureFarDate: string;
+        futureIndicateExpression: string;
+        futureNearDate: string;
+        whatHappens: string;
+      }>
+    | undefined
+  >(undefined);
 
   useEffect(() => {
     if (!data) {
@@ -30,10 +52,17 @@ export default function Home() {
     }
 
     const newSortedFutureEvents = data
-      .filter((futureEvent: any) => {
-        if (!futureEvent) {
-          return false;
-        }
+      .filter((v) => v)
+      .filter(
+        (element) =>
+          new Date().getTime() < new Date(element.futureFarDate).getTime()
+      )
+      .filter((element, index: number, self) => {
+        return (
+          self.findIndex((e) => e.whatHappens === element.whatHappens) === index
+        );
+      })
+      .filter((futureEvent) => {
         if (
           futureEvent.futureNearDate === null ||
           futureEvent.futureFarDate === null ||
@@ -52,13 +81,7 @@ export default function Home() {
         }
         return true;
       })
-      .filter((element: any, index: number, self: any) => {
-        return (
-          self.findIndex((e: any) => e.whatHappens === element.whatHappens) ===
-          index
-        );
-      })
-      .sort((a: any, b: any) => {
+      .sort((a, b) => {
         if (a.futureFarDate !== b.futureFarDate) {
           return (
             new Date(a.futureFarDate).getTime() -
@@ -80,13 +103,13 @@ export default function Home() {
         return;
       }
       const filteredFutureEvents = sortedFutureEvents
-        .filter((event: any) => {
+        .filter((event) => {
           return (
             start.getTime() <= new Date(event.futureNearDate).getTime() &&
             new Date(event.futureNearDate).getTime() <= end.getTime()
           );
         })
-        .filter((event: any) => {
+        .filter((event) => {
           if (inputText.length === 0) {
             return true;
           } else {
@@ -146,7 +169,7 @@ export default function Home() {
               </h3>
               <div>
                 {thisMonthFutureEvents &&
-                  thisMonthFutureEvents.map((event: any) => {
+                  thisMonthFutureEvents.map((event) => {
                     const futureNearDate = new Date(event.futureNearDate);
                     const futureFarDate = new Date(event.futureFarDate);
                     const whatHappens = event.whatHappens;
