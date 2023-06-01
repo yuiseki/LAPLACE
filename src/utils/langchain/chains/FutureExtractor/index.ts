@@ -22,16 +22,6 @@ WhatHappens: Concise summary of what event is appointments in future, SHOULD be 
 Examples:
 -----
 Input text:
-2023-05-19 配信
-防衛費増額の財源確保に向けて「防衛力強化資金」の創設を盛り込んだ法案は、19日の衆議院財務金融委員会で採決が行われ、自民・公明両党などの賛成多数で可決されました。法案は、来週、本会議でも可決されて参議院に送られる見通しです。
-Output:
-CurrentDate: 2023-05-19
-FutureIndicateExpression: 来週
-FutureNearDate: 2023-05-22
-FutureFarDate: 2023-05-28
-WhatHappens: 本会議で、 防衛力強化資金の創設を盛り込んだ法案が可決され、参議院に送られる
-
-Input text:
 2023-05-26 配信
 政府が来月「骨太の方針」をまとめるのを前に、自民党内のいわゆる財政再建派の議員らは、財政の持続可能性を維持するため必要があれば将来的な増税の議論も排除しない内容の提言案を大筋で了承しました。
 Output:

@@ -231,6 +231,7 @@ const predictFuture = async (newsItem: {
     return futureEvent;
   } catch (error) {
     console.error(error);
+    console.error("Error!!!", newsItem.link);
   }
 };
 
