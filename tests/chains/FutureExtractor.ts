@@ -82,6 +82,7 @@ const newsItems: Array<{
   title: string;
   pubDate: string;
 }> = [];
+
 for await (const futureUrl of futuresTokyoNhkNewsUrl) {
   console.log("news search url:", futureUrl);
   const res = await fetch(futureUrl);
