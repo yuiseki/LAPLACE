@@ -13,7 +13,7 @@
     "test:laplace": "node --loader ts-node/esm ./tests/laplace.ts"
   },
   "dependencies": {
-    "@types/node": "20.9.2",
+    "@types/node": "20.10.4",
     "@types/react": "18.2.38",
     "@types/react-dom": "18.2.17",
     "cheerio": "^1.0.0-rc.12",
