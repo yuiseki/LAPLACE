@@ -3,7 +3,7 @@ dotenv.config();
 
 import { Md5 } from "ts-md5";
 
-import { OpenAI } from "langchain/llms/openai";
+import { OpenAIChat } from "langchain/llms/openai";
 import { loadFutureExtractorChain } from "../../src/utils/langchain/chains/FutureExtractor/index.ts";
 
 import fs from "node:fs/promises";
@@ -130,7 +130,7 @@ try {
   console.log("not yet extracted:", futureEventsTodayJsonFilePath);
 }
 
-const llm = new OpenAI({ temperature: 0, maxConcurrency: 10 });
+const llm = new OpenAIChat({ temperature: 0, maxConcurrency: 10 });
 const chain = loadFutureExtractorChain({ llm });
 
 const predictFuture = async (newsItem: {
