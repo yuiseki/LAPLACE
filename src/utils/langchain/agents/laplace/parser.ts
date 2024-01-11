@@ -2,6 +2,10 @@ import { AgentActionOutputParser } from "langchain/agents";
 import { AgentAction, AgentFinish } from "langchain/schema";
 
 export class LaplaceOutputParser extends AgentActionOutputParser {
+  get lc_namespace() {
+    return ["laplace"];
+  }
+
   async parse(text: string): Promise<AgentAction | AgentFinish> {
     if (text.includes("Final Answer:")) {
       const parts = text.split("Final Answer:");

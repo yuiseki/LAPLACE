@@ -1,3 +1,4 @@
+import { StringPromptValueInterface } from "@langchain/core/prompt_values";
 import {
   BasePromptTemplate,
   BaseStringPromptTemplate,
@@ -60,8 +61,10 @@ export class LaplaceAgentPromptTemplate extends BaseStringPromptTemplate {
     return Promise.resolve(renderTemplate(template, "f-string", newInput));
   }
 
-  partial(_values: PartialValues): Promise<BasePromptTemplate> {
-    throw new Error("Not implemented");
+  partial(
+    values: PartialValues
+  ): Promise<BasePromptTemplate<any, StringPromptValueInterface, any>> {
+    throw new Error("Method not implemented.");
   }
 
   serialize(): SerializedBasePromptTemplate {
